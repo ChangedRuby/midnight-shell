@@ -9,7 +9,6 @@ import qs.components
 import qs.components.containers
 import qs.components.controls
 import qs.components.effects
-import qs.components.images
 import qs.services
 import qs.utils
 
@@ -216,7 +215,7 @@ Item {
 
                             radius: Tokens.rounding.medium
 
-                            CachingImage {
+                            Image {
                                 anchors.fill: parent
                                 source: modelData.thumbs?.large || modelData.thumbs?.small || ""
                                 asynchronous: true
@@ -290,7 +289,7 @@ Item {
                         onClicked: root.selectPrev()
                     }
 
-                    CachingImage {
+                    Image {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                         anchors.margins: Tokens.padding.large

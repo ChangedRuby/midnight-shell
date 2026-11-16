@@ -2,12 +2,12 @@ import QtQuick
 import Quickshell
 import Caelestia.Config
 import Caelestia.Models
+import Caelestia.Multimedia
+import Caelestia.State
 import qs.components
 import qs.components.effects
-import qs.components.images
 import qs.services
 import qs.utils
-import Quickshell.Io
 
 Item {
     id: root
@@ -27,17 +27,9 @@ Item {
     implicitWidth: image.width + Tokens.padding.medium * 2
     implicitHeight: image.height + label.height + Tokens.spacing.extraSmall + Tokens.padding.large + Tokens.padding.medium
 
-    Process {
-        id: thumbGenerator
-        command: ["bash", "-c", `mkdir -p "$(dirname "${thumbImg.path.toString().replace("file://", "")}")" && ffmpeg -i "${root.modelData.path}" -vframes 1 -q:v 2 "${thumbImg.path.toString().replace("file://", "")}" -y`]
-        onExited: {
-            let oldSource = thumbImg.path;
-            thumbImg.path = "";
-            thumbImg.path = oldSource;
-        }
-    }
-
     StateLayer {
+        id: stateLayer
+
         radius: Tokens.rounding.large
         onClicked: {
             Wallpapers.setWallpaper(root.modelData.path);
@@ -74,25 +66,18 @@ Item {
             text: "image"
             color: Colours.tPalette.m3outline
             fontStyle: Tokens.font.icon.builders.extraLarge.scale(2).weight(Font.DemiBold).build()
-            visible: thumbImg.status !== Image.Ready
+            visible: !thumbImg.ready
         }
 
-        CachingImage {
+        Visual {
             id: thumbImg
             anchors.fill: parent
-            path: Wallpapers.getThumbnailPath(root.modelData.path)
-            smooth: !root.PathView.view.moving
-            sourceSize: {
-                const dpr = (QsWindow.window as QsWindow)?.devicePixelRatio ?? 1;
-                return Qt.size(image.implicitWidth * dpr, image.implicitHeight * dpr);
-            }
-            onStatusChanged: {
-                if (status === Image.Error && Images.isVideo(root.modelData.name)) {
-                    if (!thumbGenerator.running) {
-                        thumbGenerator.running = true;
-                    }
-                }
-            }
+            // Wallpaper Engine entries point at project.json: show their preview image.
+            // Images and videos go straight to Visual, which makes its own preview.
+            source: root.modelData.name === "project.json"
+                ? Wallpapers.getThumbnailPath(root.modelData.path)
+                : root.modelData.path
+            playing: (root.PathView.isCurrentItem && PersistentState.wallpaperPlaying) || stateLayer.containsMouse
         }
     }
 

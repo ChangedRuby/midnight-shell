@@ -73,6 +73,9 @@ Scope {
             options["decoration:fullscreen_opacity"] = 1;
         }
 
+        // Extra options from gameMode.options (Caelestia) win over the toggles above.
+        Object.assign(options, gameModeConfig.options);
+
         Hypr.extras.applyOptions(options);
 
         if (gameModeConfig.disableWindowTransparency) {

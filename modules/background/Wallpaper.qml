@@ -3,6 +3,8 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Caelestia
 import Caelestia.Config
+import Caelestia.Multimedia
+import Caelestia.State
 import QtQuick.Effects
 import M3Shapes
 import qs.components
@@ -152,8 +154,6 @@ Item {
 
         property bool renderActive: false
 
-        readonly property bool isPlayerPlaying: !!(videoChannelLoader.item && videoChannelLoader.item["playing"])
-
         anchors.fill: parent
         opacity: 0
 
@@ -270,7 +270,7 @@ Item {
             }
         }
         
-        readonly property bool hasReadyContent: thumbImg.status === Image.Ready || isPlayerPlaying || gifImg.status === Image.Ready
+        readonly property bool hasReadyContent: visual.ready || gifImg.status === Image.Ready
         readonly property bool needsMask: animsEnabled && img.z === 1 && hasReadyContent && img.maskRadius < (img.maxRadius - 1.5) && !!maskLoader.item
 
         Component.onCompleted: maskRadius = maxRadius
@@ -338,73 +338,21 @@ Item {
                 }
             }
 
-            CachingImage {
-                id: thumbImg
+            // Stills and videos. Visual picks the path from the file type: stills go
+            // through its GPU cache, videos loop and stop/resume through `playing`.
+            // GIFs stay on gifImg above because Visual only shows their first frame.
+            Visual {
+                id: visual
+
                 anchors.fill: parent
-                path: img.verifiedPath
-                source: {
-                    if (!img.verifiedPath)
-                        return "";
-                    if (img.isVideo) {
-                        const thumb = Wallpapers.getWallpaperThumb(img.verifiedPath, Wallpapers.cacheBuster);
-                        return typeof thumb === "string" ? thumb : "";
-                    }
-                    return img.verifiedPath;
-                }
+                source: img.isGif ? "" : img.verifiedPath
+                playing: img.isVideo && img.renderActive && !WallpaperPauser.paused && PersistentState.wallpaperPlaying
+                animate: false
+                visible: !img.isGif
 
-                visible: (!img.isVideo && !img.isGif) || (img.isVideo && !img.isPlayerPlaying && videoChannelLoader.status !== Loader.Ready)
-                asynchronous: true
-
-                onStatusChanged: {
-                    if (status === Image.Ready && !img.isVideo && !img.isGif && img.verifiedPath === root.settledSource)
+                onReadyChanged: {
+                    if (ready && !img.isGif && img.verifiedPath === root.settledSource)
                         root.current = img;
-                }
-            }
-
-            Loader {
-                id: videoChannelLoader
-                anchors.fill: parent
-                asynchronous: true
-
-                active: img.isVideo && img.verifiedPath !== "" && img.renderActive
-                source: "VideoWallpaper.qml"
-
-                Timer {
-                    id: resumeTimer
-                    interval: 150
-                    repeat: false
-                    onTriggered: {
-                        if (videoChannelLoader.item && img.isVideo && !WallpaperPauser.paused && img.state === "active") {
-                            videoChannelLoader.item["stop"]();
-                            videoChannelLoader.item["play"]();
-                        }
-                    }
-                }
-
-                Connections {
-                    target: WallpaperPauser
-                    ignoreUnknownSignals: true
-                    enabled: img.isVideo && videoChannelLoader.active
-
-                    function onPausedChanged() {
-                        if (videoChannelLoader.item && img.isVideo) {
-                            if (WallpaperPauser.paused) {
-                                resumeTimer.stop();
-                                videoChannelLoader.item["pause"]();
-                            } else {
-                                if (img.state === "active") {
-                                    resumeTimer.restart();
-                                }
-                            }
-                        }
-                    }
-                }
-
-                onLoaded: {
-                    if (item && img.verifiedPath !== "") {
-                        item.videoSource = root.toFileUrl(img.verifiedPath);
-                        item.autoStart = !WallpaperPauser.paused;
-                    }
                 }
             }
         }
