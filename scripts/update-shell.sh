@@ -36,10 +36,15 @@ fi
 
 # caelestia-cli is a runtime dependency; before it is installed (first swap
 # away from midnight-cli) makepkg must not try to resolve it.
+# The check is on the package name: midnight-cli-git also *provides*
+# caelestia-cli, which must not count as the real thing.
 flags=(-fsi)
-pacman -Q caelestia-cli &>/dev/null || {
+pacman -Qq | grep -Eqx 'caelestia-cli(-git)?' || {
     echo "note: caelestia-cli is not installed, building without dependency checks (--nodeps, no install)"
     flags=(-f --nodeps)
 }
+
+# makepkg rewrites pkgver inside PKGBUILD; keep the tracked file untouched.
+trap 'git checkout -- PKGBUILD 2>/dev/null || true' EXIT
 
 makepkg "${flags[@]}"
