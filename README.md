@@ -4,15 +4,24 @@
 
 <div align=center>
 
-![GitHub last commit](https://img.shields.io/github/last-commit/dim-ghub/midnight-shell?style=for-the-badge&labelColor=101418&color=9ccbfb)
-![GitHub Repo stars](https://img.shields.io/github/stars/dim-ghub/midnight-shell?style=for-the-badge&labelColor=101418&color=b9c8da)
-![GitHub repo size](https://img.shields.io/github/repo-size/dim-ghub/midnight-shell?style=for-the-badge&labelColor=101418&color=d3bfe6)
+![GitHub last commit](https://img.shields.io/github/last-commit/ChangedRuby/midnight-shell?style=for-the-badge&labelColor=101418&color=9ccbfb)
+![GitHub Repo stars](https://img.shields.io/github/stars/ChangedRuby/midnight-shell?style=for-the-badge&labelColor=101418&color=b9c8da)
+![GitHub repo size](https://img.shields.io/github/repo-size/ChangedRuby/midnight-shell?style=for-the-badge&labelColor=101418&color=d3bfe6)
 [![Discord invite](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscordapp.com%2Fapi%2Finvites%2FBGDCFCmMBk%3Fwith_counts%3Dtrue&query=approximate_member_count&style=for-the-badge&logo=discord&logoColor=ffffff&label=discord&labelColor=101418&color=96f1f1&link=https%3A%2F%2Fdiscord.gg%2FBGDCFCmMBk)](https://discord.gg/BGDCFCmMBk)
 
 </div>
 
-> [!WARNING]
-> This project is no longer being maintained by me. I have started work on my own rust based shell. As soon as it is publicly available, you may find it [here](https://github.com/Kiite-Org/KiiteShell).
+> [!IMPORTANT]
+> **This is a community fork that keeps MiDnight Shell alive.**
+> The original [dim-ghub/midnight-shell](https://github.com/dim-ghub/midnight-shell) was discontinued by its author, who moved on to
+> a Rust-based shell ([KiiteShell](https://github.com/Kiite-Org/KiiteShell)). This repository,
+> [ChangedRuby/midnight-shell](https://github.com/ChangedRuby/midnight-shell), continues from the last upstream commit
+> (`f4ade958`) with the goal of keeping the shell maintained and as current as possible with
+> [caelestia-dots/shell](https://github.com/caelestia-dots/shell).
+>
+> - **Credit:** all the features below were written by the original MiDnight Shell contributors.
+> - **Staying current:** Caelestia is merged in regularly with [`scripts/sync-caelestia.sh`](scripts/sync-caelestia.sh).
+>   Where Caelestia and MiDnight disagree on design, the MiDnight behaviour is kept.
 
 > [!NOTE]
 > This is a fork of the official [caelestia-shell](https://github.com/caelestia-dots/shell) with additional features. All new features are listed below.
@@ -41,14 +50,15 @@ This fork adds the following features on top of the official shell:
 ## Installation
 
 > [!NOTE]
-> This repository is a **FORK**, and can be out of date or have missing features from the [main repo](https://github.com/caelestia-dots/caelestia).
-> This fork is available at [dim-ghub/midnight-shell](https://github.com/dim-ghub/midnight-shell).
+> This repository is a **FORK** of the discontinued [dim-ghub/midnight-shell](https://github.com/dim-ghub/midnight-shell),
+> which itself forks [caelestia-shell](https://github.com/caelestia-dots/shell), and it can lag behind the [main repo](https://github.com/caelestia-dots/caelestia).
+> This fork is available at [ChangedRuby/midnight-shell](https://github.com/ChangedRuby/midnight-shell).
 
 ### Arch Linux (this fork)
 
 <details><summary id="dependencies">Dependencies</summary>
 
--   [`midnight-cli` (this fork is recommended and required for some features to work)](https://github.com/dim-ghub/midnight-cli)
+-   [`caelestia-cli`](https://github.com/caelestia-dots/cli) - the official CLI. The shell only calls `scheme`, `wallpaper`, `record`, `screenshot` and `shell`, which it provides
 -   [`quickshell-git`](https://quickshell.outfoxxed.me) - this has to be the git version, not the latest tagged version
 -   [`ddcutil`](https://github.com/rockowitz/ddcutil)
 -   [`brightnessctl`](https://github.com/Hummer12007/brightnessctl)
@@ -70,7 +80,22 @@ Build dependencies:
 -   [`ninja`](https://github.com/ninja-build/ninja)
 </details>
 
-**To install the shell, you can either use [pkgit](https://git.symlinx.net/pkgit) or the [AUR package](https://aur.archlinux.org/packages/midnight-shell-git)**
+> [!WARNING]
+> The AUR package `midnight-shell-git` builds the **discontinued upstream** and does not contain this fork's changes.
+> Use the PKGBUILD in this repository instead.
+
+**To install the shell, build it from this repository, or use [pkgit](https://git.symlinx.net/pkgit)**
+
+From this repository (builds `pkg/PKGBUILD` from the `main` branch and installs `midnight-ruby-git`):
+
+```sh
+git clone https://github.com/ChangedRuby/midnight-shell.git
+cd midnight-shell
+scripts/update-shell.sh
+```
+
+The same command updates it later; it only rebuilds when `main` has moved. The package conflicts with
+`midnight-shell-git` and `caelestia-shell`, which pacman offers to remove.
 
 Using `pkgit`:
 
@@ -79,18 +104,10 @@ Install [`pkgit`](https://git.symlinx.net/pkgit) (also available on the AUR as [
 Then you can simply install the shell directly from GitHub without cloning it:
 
 ```sh
-pkgit -i https://github.com/dim-ghub/midnight-shell
+pkgit -i https://github.com/ChangedRuby/midnight-shell
 ```
 
 
-Using `AUR`
-```sh
-paru -S midnight-shell-git
-# or yay -S midnight-shell-git
-```
-
-> [!NOTE]
-> The recommended way to fully install MiDnight Shell is using [MiDnight CLI](https://github.com/dim-ghub/midnight-cli)'s command "`caelestia install`".
 
 #### Manual installation
 
@@ -99,7 +116,7 @@ Then simply build and install using `cmake`:
 
 ```sh
 cd $XDG_CONFIG_HOME/quickshell
-git clone https://github.com/dim-ghub/midnight-shell.git caelestia
+git clone https://github.com/ChangedRuby/midnight-shell.git caelestia
 
 cd caelestia
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/
