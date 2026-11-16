@@ -1,0 +1,11 @@
+# Conflict policy for scripts/sync-caelestia.sh. One rule per line:
+#   ours   <glob>    keep midnight's version
+#   theirs <glob>    take Caelestia's version
+# Later rules win. A file with no matching rule stops the sync so it can be
+# discussed. Globs match the whole path and * also crosses directories.
+#
+# Examples (none enabled yet):
+# ours   README.md
+# ours   modules/launcher/*
+# theirs nix/*
+# theirs .github/*
