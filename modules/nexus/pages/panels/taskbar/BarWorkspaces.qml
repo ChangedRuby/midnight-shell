@@ -91,6 +91,18 @@ PageBase {
         }
 
         ToggleRow {
+            text: qsTr("Real app icons")
+            subtext: qsTr("Show each app's own icon instead of a generic one (needs Show windows)")
+            configNode: root.targetConfig.bar.workspaces
+            propertyName: "appIcons"
+            checked: root.targetConfig.bar.workspaces.appIcons
+            onToggled: {
+                root.targetConfig.bar.workspaces.appIcons = checked;
+                root.targetConfig.save();
+            }
+        }
+
+        ToggleRow {
             text: qsTr("Show unoccupied")
             subtext: qsTr("Show workspaces that are inactive and empty")
             configNode: root.targetConfig.bar.workspaces

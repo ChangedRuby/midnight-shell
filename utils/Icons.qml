@@ -147,6 +147,13 @@ Singleton {
         return Quickshell.iconPath(icon);
     }
 
+    // Path of the app's real icon (from its desktop entry and the icon theme),
+    // or "" when the app has none, so callers can fall back to a glyph.
+    function getAppIconPath(name: string): string {
+        const icon = DesktopEntries.heuristicLookup(name)?.icon;
+        return icon ? Quickshell.iconPath(icon, true) : "";
+    }
+
     function getAppCategoryIcon(name: string, fallback: string): string {
         const match = matchIconRuleList(name, GlobalConfig.bar.workspaces.windowIcons);
         if (match)
