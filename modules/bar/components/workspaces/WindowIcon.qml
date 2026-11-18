@@ -15,9 +15,18 @@ Loader {
 
     required property string wmClass
 
-    readonly property string appIconPath: Config.bar.workspaces.appIcons ? Icons.getAppIconPath(wmClass) : ""
+    // Real icons must not sit under the active indicator, which tints everything
+    // below it with a single colour. Workspace.qml therefore draws them in a second
+    // layout above the indicator (realLayer) and hides them in the first one.
+    // Both layouts hold every icon so they keep the same size; only one is visible.
+    property bool separateRealLayer: false
+    property bool realLayer: false
 
-    sourceComponent: appIconPath ? appIcon : glyph
+    readonly property string appIconPath: Config.bar.workspaces.appIcons ? Icons.getAppIconPath(wmClass) : ""
+    readonly property bool isReal: appIconPath !== ""
+
+    opacity: !separateRealLayer || isReal === realLayer ? 1 : 0
+    sourceComponent: isReal ? appIcon : glyph
 
     Component {
         id: glyph

@@ -93,6 +93,7 @@ PageBase {
         ToggleRow {
             text: qsTr("Real app icons")
             subtext: qsTr("Show each app's own icon instead of a generic one (needs Show windows)")
+            enabled: root.targetConfig.bar.workspaces.showWindows
             configNode: root.targetConfig.bar.workspaces
             propertyName: "appIcons"
             checked: root.targetConfig.bar.workspaces.appIcons
