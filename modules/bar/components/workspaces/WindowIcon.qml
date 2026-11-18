@@ -25,8 +25,11 @@ Loader {
     readonly property string appIconPath: Config.bar.workspaces.appIcons ? Icons.getAppIconPath(wmClass) : ""
     readonly property bool isReal: appIconPath !== ""
 
+    // Only the layer that shows the icon loads it; the other one just keeps its size.
+    readonly property bool showsRealIcon: isReal && (!separateRealLayer || realLayer)
+
     opacity: !separateRealLayer || isReal === realLayer ? 1 : 0
-    sourceComponent: isReal ? appIcon : glyph
+    sourceComponent: showsRealIcon ? appIcon : isReal ? spacer : glyph
 
     Component {
         id: glyph
@@ -42,10 +45,32 @@ Loader {
         id: appIcon
 
         IconImage {
-            asynchronous: true
+            // Synchronous on purpose: asynchronous loads run KIconLoader on Qt's pixmap
+            // reader thread, which is not thread safe and segfaults when the GUI thread
+            // loads the same icon at the same time (for example when a window of an app
+            // with that icon opens, like Nexus does with org.quickshell).
+            asynchronous: false
             source: root.appIconPath
             // Same size as the glyph it replaces, so the indicator does not resize.
             implicitSize: probe.implicitHeight
+
+            MaterialIcon {
+                id: probe
+
+                visible: false
+                grade: 0
+                text: "terminal"
+            }
+        }
+    }
+
+    // Takes the place of the icon in the layer where it is hidden.
+    Component {
+        id: spacer
+
+        Item {
+            implicitWidth: probe.implicitHeight
+            implicitHeight: probe.implicitHeight
 
             MaterialIcon {
                 id: probe

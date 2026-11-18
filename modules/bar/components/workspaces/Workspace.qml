@@ -284,7 +284,7 @@ GridLayout {
                 WindowIcon {
                     required property var modelData
 
-                    wmClass: modelData.lastIpcObject.class
+                    wmClass: modelData.lastIpcObject?.class ?? ""
                     separateRealLayer: Config.bar.workspaces.appIcons
                     realLayer: root.realIconsLayer
                 }
@@ -330,7 +330,7 @@ GridLayout {
                 WindowIcon {
                     required property var modelData
 
-                    wmClass: modelData.lastIpcObject.class
+                    wmClass: modelData.lastIpcObject?.class ?? ""
                     separateRealLayer: Config.bar.workspaces.appIcons
                     realLayer: root.realIconsLayer
                 }

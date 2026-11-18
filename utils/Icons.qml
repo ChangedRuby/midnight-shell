@@ -150,6 +150,12 @@ Singleton {
     // Path of the app's real icon (from its desktop entry and the icon theme),
     // or "" when the app has none, so callers can fall back to a glyph.
     function getAppIconPath(name: string): string {
+        // Quickshell's own windows (Nexus and the like) keep the glyph. The icon provider
+        // loads on Qt's pixmap reader thread, and KIconLoader is not thread safe: asking for
+        // the icon at the very moment Qt creates one of our windows has segfaulted the shell.
+        if (name === "org.quickshell")
+            return "";
+
         const icon = DesktopEntries.heuristicLookup(name)?.icon;
         return icon ? Quickshell.iconPath(icon, true) : "";
     }
