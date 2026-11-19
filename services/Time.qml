@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Caelestia.I18n
+import Caelestia.Config
 
 Singleton {
     property alias enabled: clock.enabled
@@ -24,6 +25,7 @@ Singleton {
     SystemClock {
         id: clock
 
-        precision: SystemClock.Seconds
+        // Per-second ticks wake the shell (and re-render the bar) every second; only pay for that when a seconds display is enabled
+        precision: GlobalConfig.bar.clock.showSeconds || GlobalConfig.dashboard.showClockSeconds ? SystemClock.Seconds : SystemClock.Minutes
     }
 }

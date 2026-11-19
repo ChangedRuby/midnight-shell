@@ -135,6 +135,11 @@ Singleton {
             } else if (["openwindow", "closewindow", "movewindow"].includes(n)) {
                 Hyprland.refreshToplevels();
                 Hyprland.refreshWorkspaces();
+            } else if (n === "windowtitle") {
+                // Terminals (and Claude Code) animate their title several times a second.
+                // A full toplevel refresh per event re-evaluates every binding in the shell, so coalesce.
+                if (!titleRefreshTimer.running)
+                    titleRefreshTimer.start();
             } else if (n.includes("mon")) {
                 Hyprland.refreshMonitors();
             } else if (n.includes("workspace")) {
@@ -145,6 +150,13 @@ Singleton {
         }
 
         target: Hyprland
+    }
+
+    Timer {
+        id: titleRefreshTimer
+
+        interval: 500
+        onTriggered: Hyprland.refreshToplevels()
     }
 
     Connections {

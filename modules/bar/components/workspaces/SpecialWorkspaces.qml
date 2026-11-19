@@ -326,9 +326,9 @@ Item {
         flow: isHorizontal ? GridLayout.LeftToRight : GridLayout.TopToBottom
 
         // The parent is the contentItem of whichever list holds this delegate.
-        anchors.left: isHorizontal ? undefined : parent.left
-        anchors.right: isHorizontal ? undefined : parent.right
-        anchors.top: isHorizontal ? parent.top : undefined
+        anchors.left: isHorizontal || !parent ? undefined : parent.left
+        anchors.right: isHorizontal || !parent ? undefined : parent.right
+        anchors.top: isHorizontal && parent ? parent.top : undefined
         anchors.bottom: isHorizontal ? parent.bottom : undefined
 
         columnSpacing: 0

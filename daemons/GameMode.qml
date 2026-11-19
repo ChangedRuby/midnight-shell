@@ -40,11 +40,20 @@ Scope {
         }
     }
 
+    // Only poll while auto-enable is actually configured (it was an unconditional 500 ms wakeup)
     Timer {
-        interval: 500
+        interval: 2000
         repeat: true
-        running: true
+        running: GlobalConfig.utilities.gameMode.autoEnable && GlobalConfig.utilities.gameMode.autoEnableRegexes.length > 0
         onTriggered: root.evaluateAutoEnable()
+    }
+
+    Connections {
+        function onValuesChanged(): void {
+            root.evaluateAutoEnable();
+        }
+
+        target: Hyprland.toplevels
     }
 
     Connections {
