@@ -99,6 +99,32 @@ ClipRect {
             }
         }
 
+        // Real app icons, above the active indicator so it does not tint them.
+        // Same geometry as `layout`; its workspaces draw only the real icons.
+        Loader {
+            anchors.centerIn: parent
+            active: Config.bar.workspaces.appIcons && Config.bar.workspaces.showWindows
+
+            sourceComponent: GridLayout {
+                columns: isHorizontal ? -1 : 1
+                rows: isHorizontal ? 1 : -1
+                flow: isHorizontal ? GridLayout.LeftToRight : GridLayout.TopToBottom
+                columnSpacing: Math.floor(Tokens.spacing.small)
+                rowSpacing: Math.floor(Tokens.spacing.small)
+
+                Repeater {
+                    model: Config.bar.workspaces.shown
+
+                    Workspace {
+                        activeWsId: root.activeWsId
+                        occupied: root.occupied
+                        groupOffset: root.groupOffset
+                        realIconsLayer: true
+                    }
+                }
+            }
+        }
+
         MouseArea {
             anchors.fill: layout
             onClicked: event => {

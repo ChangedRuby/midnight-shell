@@ -16,6 +16,8 @@ GridLayout {
     required property int activeWsId
     required property var occupied
     required property int groupOffset
+    // True for the copy that only shows real app icons (see WindowIcon.qml).
+    property bool realIconsLayer: false
 
     readonly property bool isWorkspace: true // Flag for finding workspace children
     readonly property bool isHorizontal: Config.bar.position === "top" || Config.bar.position === "bottom"
@@ -59,6 +61,7 @@ GridLayout {
         Layout.preferredHeight: isHorizontal ? -1 : (Tokens.sizes.bar.innerWidth - Tokens.padding.small)
 
         asynchronous: true
+        active: !root.realIconsLayer
         sourceComponent: Config.bar.workspaces.useIcon ? iconComponent : textComponent
     }
 
@@ -278,12 +281,12 @@ GridLayout {
                     }
                 }
 
-                MaterialIcon {
+                WindowIcon {
                     required property var modelData
 
-                    grade: 0
-                    text: Icons.getAppCategoryIcon(modelData.lastIpcObject.class, "terminal")
-                    color: Colours.palette.m3onSurfaceVariant
+                    wmClass: modelData.lastIpcObject?.class ?? ""
+                    separateRealLayer: Config.bar.workspaces.appIcons
+                    realLayer: root.realIconsLayer
                 }
             }
         }
@@ -324,12 +327,12 @@ GridLayout {
                     }
                 }
 
-                MaterialIcon {
+                WindowIcon {
                     required property var modelData
 
-                    grade: 0
-                    text: Icons.getAppCategoryIcon(modelData.lastIpcObject.class, "terminal")
-                    color: Colours.palette.m3onSurfaceVariant
+                    wmClass: modelData.lastIpcObject?.class ?? ""
+                    separateRealLayer: Config.bar.workspaces.appIcons
+                    realLayer: root.realIconsLayer
                 }
             }
         }

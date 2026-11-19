@@ -256,6 +256,32 @@ Item {
         }
     }
 
+    // Real app icons, above the active indicator so it does not tint them.
+    // Same model, geometry and scroll as `view`; draws only the real icons.
+    Loader {
+        anchors.fill: parent
+        active: Config.bar.workspaces.appIcons && Config.bar.workspaces.showWindowsOnSpecialWorkspaces
+
+        sourceComponent: ListView {
+            id: realIconsView
+
+            spacing: view.spacing
+            interactive: false
+            orientation: view.orientation
+            model: view.model
+            delegate: SpecialWsDelegate {
+                realIconsLayer: true
+            }
+
+            // `view` is dragged by moving its contentItem; follow it.
+            Binding {
+                target: realIconsView.contentItem
+                property: isHorizontal ? "x" : "y"
+                value: isHorizontal ? view.contentItem.x : view.contentItem.y
+            }
+        }
+    }
+
     MouseArea {
         property real startPos
 
@@ -292,15 +318,18 @@ Item {
         property int wsId
         property string icon
         property bool hasWindows
+        // True for the copy that only shows real app icons (see WindowIcon.qml).
+        property bool realIconsLayer: false
 
         columns: isHorizontal ? -1 : 1
         rows: isHorizontal ? 1 : -1
         flow: isHorizontal ? GridLayout.LeftToRight : GridLayout.TopToBottom
 
-        anchors.left: isHorizontal ? undefined : view.contentItem.left
-        anchors.right: isHorizontal ? undefined : view.contentItem.right
-        anchors.top: isHorizontal ? view.contentItem.top : undefined
-        anchors.bottom: isHorizontal ? view.contentItem.bottom : undefined
+        // The parent is the contentItem of whichever list holds this delegate.
+        anchors.left: isHorizontal ? undefined : parent.left
+        anchors.right: isHorizontal ? undefined : parent.right
+        anchors.top: isHorizontal ? parent.top : undefined
+        anchors.bottom: isHorizontal ? parent.bottom : undefined
 
         columnSpacing: 0
         rowSpacing: 0
@@ -345,6 +374,8 @@ Item {
             id: label
 
             asynchronous: true
+            // Hidden, not unloaded, in the real-icons copy so both lists keep the same size.
+            opacity: ws.realIconsLayer ? 0 : 1
 
             Layout.alignment: isHorizontal ? (Qt.AlignVCenter | Qt.AlignLeft) : (Qt.AlignHCenter | Qt.AlignTop)
             Layout.preferredWidth: isHorizontal ? Tokens.sizes.bar.innerWidth : -1
@@ -433,12 +464,12 @@ Item {
                         }
                     }
 
-                    MaterialIcon {
+                    WindowIcon {
                         required property var modelData
 
-                        grade: 0
-                        text: Icons.getAppCategoryIcon(modelData.lastIpcObject.class, "terminal")
-                        color: Colours.palette.m3onSurfaceVariant
+                        wmClass: modelData.lastIpcObject?.class ?? ""
+                        separateRealLayer: Config.bar.workspaces.appIcons
+                        realLayer: ws.realIconsLayer
                     }
                 }
             }
@@ -477,12 +508,12 @@ Item {
                         }
                     }
 
-                    MaterialIcon {
+                    WindowIcon {
                         required property var modelData
 
-                        grade: 0
-                        text: Icons.getAppCategoryIcon(modelData.lastIpcObject.class, "terminal")
-                        color: Colours.palette.m3onSurfaceVariant
+                        wmClass: modelData.lastIpcObject?.class ?? ""
+                        separateRealLayer: Config.bar.workspaces.appIcons
+                        realLayer: ws.realIconsLayer
                     }
                 }
             }
