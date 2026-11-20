@@ -5,11 +5,17 @@ import Quickshell
 import Quickshell.Io
 import Caelestia
 import Caelestia.Config
+import "emojidata.js" as EmojiData
 
 QtObject {
     id: root
 
-    property var items: []
+    // The full list (~12k entries) is kept in emojidata.js; the panel only renders a
+    // window of it, so cap what is handed to the list model (it diffs every value).
+    readonly property int maxResults: 2000
+
+    // Number of loaded emojis; bindings read it so they re-run once the list is in.
+    property int count: 0
     property var frequencies: ({})
     property bool _loaded: false
 
@@ -18,25 +24,7 @@ QtObject {
         command: ["cat", "/usr/lib/python3.14/site-packages/caelestia/data/emojis.txt"]
         stdout: StdioCollector {
             onStreamFinished: {
-                const result = [];
-                const lines = text.trim().split("\n");
-
-                for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    if (!line)
-                        continue;
-
-                    const spaceIdx = line.indexOf(" ");
-                    if (spaceIdx < 0)
-                        continue;
-
-                    result.push({
-                        char: line.substring(0, spaceIdx),
-                        name: line.substring(spaceIdx + 1).trim()
-                    });
-                }
-
-                root.items = result;
+                root.count = EmojiData.load(text);
                 root._loaded = true;
             }
         }
@@ -82,20 +70,14 @@ QtObject {
     }
 
     function getSortedItems(): var {
-        if (!items.length)
+        if (count === 0)
             return [];
-        const favEmojis = GlobalConfig.launcher.favouriteEmojis || [];
-        const favSet = new Set(favEmojis);
-        return [...items].sort((a, b) => {
-            const aIsFav = favSet.has(a.char);
-            const bIsFav = favSet.has(b.char);
-            if (aIsFav !== bIsFav)
-                return aIsFav ? -1 : 1;
-            const freqA = frequencies[a.char] || 0;
-            const freqB = frequencies[b.char] || 0;
-            if (freqA !== freqB)
-                return freqB - freqA;
-            return 0;
-        });
+        return EmojiData.sorted(GlobalConfig.launcher.favouriteEmojis || [], frequencies, maxResults);
+    }
+
+    function search(query: string): var {
+        if (count === 0)
+            return [];
+        return EmojiData.search(query, maxResults);
     }
 }

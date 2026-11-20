@@ -132,8 +132,13 @@ Scope {
         onPressed: {
             if (root.hasFullscreen)
                 return;
-            Visibilities.launcherInitialSearch = `${GlobalConfig.launcher.actionPrefix}emoji `;
             const visibilities = Visibilities.getForActive();
+            // Pressing the shortcut again closes the panel
+            if (visibilities.launcher) {
+                visibilities.launcher = false;
+                return;
+            }
+            Visibilities.launcherInitialSearch = `${GlobalConfig.launcher.actionPrefix}emoji `;
             visibilities.launcher = true;
         }
     }
@@ -146,8 +151,13 @@ Scope {
         onPressed: {
             if (root.hasFullscreen)
                 return;
-            Visibilities.launcherInitialSearch = `${GlobalConfig.launcher.actionPrefix}clipboard `;
             const visibilities = Visibilities.getForActive();
+            // Pressing the shortcut again closes the panel
+            if (visibilities.launcher) {
+                visibilities.launcher = false;
+                return;
+            }
+            Visibilities.launcherInitialSearch = `${GlobalConfig.launcher.actionPrefix}clipboard `;
             visibilities.launcher = true;
         }
     }

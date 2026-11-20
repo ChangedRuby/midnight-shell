@@ -55,9 +55,7 @@ StyledListView {
             const queryText = text.slice((prefix + "emoji ").length).toLowerCase();
             if (!queryText)
                 return Emojis.getSortedItems();
-            return Emojis.items.filter(function (item) {
-                return item.name.toLowerCase().includes(queryText);
-            });
+            return Emojis.search(queryText);
         }
         case "clipboard": {
             const prefix = GlobalConfig.launcher.actionPrefix;
